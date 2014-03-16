@@ -20,7 +20,6 @@ public class GUI {
 
     private final JFrame frame = new JFrame("Postfix Calculator");
     private final JTextField entryField = new JTextField(30);
-    private final PostfixQueue queue = new PostfixQueue();
 
 
     public GUI() {
@@ -103,6 +102,7 @@ public class GUI {
                 //and add each token into the queue. Then pass that queue to the
                 //evaluator which, if given a valid postfix expression, should
                 //return an int
+                PostfixQueue queue = new PostfixQueue();
                 PostfixEvaluator evaluator = new PostfixEvaluator();
                 Tokeniser tokeniser = new Tokeniser(entryField.getText());
                 while(tokeniser.hasNext()) {
@@ -112,7 +112,7 @@ public class GUI {
                     updateEntry(evaluator.evaluate(queue));
                 }
                 catch(ParseException exception) {
-                    queue.clear();
+                    queue = null;
                     evaluator = null;
                     tokeniser = null;
                     updateEntry(exception.getMessage());
