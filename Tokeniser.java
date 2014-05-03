@@ -1,18 +1,24 @@
 package calculator;
 
-import java.text.ParseException;
 import java.util.Iterator;
 
 
 /**
  * Class that can be used to divide a String into a sequence of Tokens
- * @author p0073862
+ * @author p0073862 & 10077518 
  */
 public class Tokeniser implements Iterator<Token> {
-
     private String expr;//changed from final
     private int index;
-
+    
+    /***The Tokeniser expects to be passed a string containing mathematical
+     * operators and operands and then outputs them as a * TokenQueue.
+     * Each symbol/number is checked to be valid but no attempt is made by 
+     * the Tokeniser to validate the expression or to detect a unary minus
+     * symbol - those functions are left to the parser. 
+     * We limit the size of expr to between 0 and 1024 to stop overflow.
+     */
+    
     /**
      * Create a Tokeniser that can divide an expression into a sequence of
      * Tokens
@@ -26,11 +32,17 @@ public class Tokeniser implements Iterator<Token> {
     /**
      * Determine whether we have read the last token in the expression
      * @return true if there is another token to be read from the expression
-     * false otherwise.
+     * false otherwise. Will return false if expr is longer than 1024 
+     * characters to stop overflow.
      */
     @Override
     public boolean hasNext() {
-        return hasCurrentChar();
+    	if (expr.length() > 0 && expr.length() < 1024) {
+            return hasCurrentChar();
+    	}
+    	else{
+            return false;
+    	}
      }
 
     
@@ -43,26 +55,34 @@ public class Tokeniser implements Iterator<Token> {
     public Token next() {
         Token tok;
         consumeWhiteSpace();
-        if (Character.isDigit(currentChar())) {
+      
+        if (Character.isDigit(currentChar()) || currentChar() == '.') {
             StringBuilder builder = new StringBuilder();
-            while(hasCurrentChar() && Character.isDigit(currentChar())){
+            while(hasCurrentChar() && (Character.isDigit(currentChar()) || currentChar() == '.')) {
                 builder.append(currentChar());
                 consumeChar();
             }
-            int num = Integer.valueOf(builder.toString());
+        try {
+            double num = Double.valueOf(builder.toString());
             tok =  new Token(Token.NUMBER, num);
-        } else {
+        }
+        catch (NumberFormatException numFormExc) {
+        	return new Token(-1,0);
+        }
+        
+        } 
+        else {
             int precedence = 0;
             int type;
-            int value;
+            double value;
             switch (currentChar()) {
-                case '+':
-                    value = Token.PLUS;
+                case '-':
+                    value = Token.MINUS;
                     precedence = 2;
                     type = Token.OPERATOR;
                     break;
-                case '-':
-                    value = Token.MINUS;
+                case '+':
+                    value = Token.PLUS;
                     precedence = 2;
                     type = Token.OPERATOR;
                     break;
@@ -84,7 +104,7 @@ public class Tokeniser implements Iterator<Token> {
                     type = Token.PUNCTUATION;
                     value = Token.RPAREN;
                     break;
-                default:
+                default:                    
                     System.out.println("Error! Unrecognised token");
                     type = -1;
                     value = 0;
@@ -98,14 +118,20 @@ public class Tokeniser implements Iterator<Token> {
         return tok;
     }
 
+   
     private char currentChar() {
-        return expr.charAt(index);
+    	if (hasCurrentChar()) {
+    		return expr.charAt(index);
+    	}
+    	return ' ';
     }
     
+        
     private boolean hasCurrentChar() {
         return index<expr.length();
     }
     
+        
     private void consumeChar() {
         index++;
     }

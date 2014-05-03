@@ -32,14 +32,15 @@ public class Token {
     public static final int MINUS = 1;
     public static final int TIMES = 2;
     public static final int DIVIDE = 3;
+    public static final int UMINUS = 4;
 
     //constants representing the possible values for Tokens whose
     //category is PUNCTUATION
     public static final int LPAREN = 5;
     public static final int RPAREN = 6;
 
-    private final int category;
-    private int value;
+    private int category;
+    private double value;
     private int precedence;
 
     /**
@@ -48,7 +49,7 @@ public class Token {
      * @param value value of the Token
      * @param precedence precedence of the Token
      */
-    public Token(int category, int value, int precedence) {
+    public Token(int category, double value, int precedence) {
         this.category = category;
         this.value = value;
         this.precedence = precedence;
@@ -59,7 +60,7 @@ public class Token {
      * @param category category of the Token
      * @param value value of the Token
      */
-    Token(int category, int value) {
+    Token(int category, double value) {
         this(category, value, 0);
     }
 
@@ -99,7 +100,7 @@ public class Token {
      * Returns the value of this Token
      * @return the value of this Token
      */
-    public int getValue() {
+    public double getValue() {
         return value;
     }
 
@@ -111,7 +112,18 @@ public class Token {
      * @return precedence of this token
      */
     public int getPrecedence() {
-        return precedence;
+        if (isOperator()){
+            return precedence;
+        }
+        return 0;
+    }
+    
+    /**
+     * Used by the parser to set value of a token
+     * @param value to set
+     */
+    public void setValue(double value) {
+    	this.value = value;
     }
 
     /**
@@ -122,24 +134,32 @@ public class Token {
     public String toString() {
         if (getCategory() == NUMBER) {
             return " " + value + " ";
-        } else {
-            switch (value) {
-                case PLUS:
-                    return " + ";
-                case MINUS:
-                    return " - ";
-                case TIMES:
-                    return " * ";
-                case DIVIDE:
-                    return " / ";
-                case LPAREN:
-                    return "(";
-                case RPAREN:
-                    return ")";
-                default:
-                    return " ? ";
+        } 
+        else {
+            if (value == PLUS) {
+                return " + ";
             }
-
+            else if (value == MINUS) {
+                return " - ";
+            }
+            else if (value == UMINUS) {
+                return "-";
+            }
+            else if (value == TIMES) {
+                return " * ";
+            }
+            else if (value == DIVIDE) {
+                return " / ";
+            }
+            else if (value == LPAREN) {
+                return "(";
+            }
+            else if (value == RPAREN) {
+                return ")";
+            }
+            else {
+                return " ? ";
+            }
         }
     }
 }

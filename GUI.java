@@ -5,72 +5,102 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.ParseException;
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JTextField;
-
+import java.util.NoSuchElementException;
 /**
  *
  * @author Stuart McKenzie 10077518
- * Thanks to p0073862
  */
 public class GUI {
 
-    private final JFrame frame = new JFrame("Postfix Calculator");
+    private final JFrame frame = new JFrame("Calculator");
     private final JTextField entryField = new JTextField(30);
-
+    
+    private char buttonPressed = 'i';
+    
+    //Create the buttons
+    JRadioButton infixButton = makeInfixButton();
+    JRadioButton postfixButton = makePostfixButton();
 
     public GUI() {
         
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);     
         Container contentPane = frame.getContentPane();
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
+        
+        //Entry Field
+        entryField.setHorizontalAlignment(JTextField.TRAILING);
         entryField.setEditable(false);
         contentPane.add(entryField);
         
+      
+        //Radio buttons for in/postfix    
+        //Add them to a ButtonGroup
+        ButtonGroup radioButtonGroup = new ButtonGroup();
+        radioButtonGroup.add(infixButton);
+        radioButtonGroup.add(postfixButton);
 
+        //Add them to a Panel
+        JPanel radioPanel = new JPanel();
+        radioPanel.setLayout(new GridLayout(1, 2));
+        radioPanel.add(infixButton);
+        radioPanel.add(postfixButton);
+
+        //Set a border and make add it to the content pane
+        radioPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), ""));
+        contentPane.add(radioPanel);
+        
+        //Button Panel
         JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new GridLayout(4,5));
-        
-        
+        buttonPanel.setLayout(new GridLayout(6,4));
+       
         //row 1
+        buttonPanel.add(makeEntryButton("("));      
+        buttonPanel.add(makeEntryButton(")"));
+        buttonPanel.add(makeDelButton());
+        buttonPanel.add(makeClearButton());
+               
+        //row 2
         for (int i = 7; i <= 9; i++) {
             buttonPanel.add(makeEntryButton(Integer.toString(i)));
         }
-        buttonPanel.add(makeDelButton());
-        buttonPanel.add(makeClearButton());
+        buttonPanel.add(makeEntryButton(" / "));
         
-        
-        //row 2
+        //row 3
         for (int i = 4; i <= 6; i++) {
             buttonPanel.add(makeEntryButton(Integer.toString(i)));
         }
-        buttonPanel.add(makeEntryButton("*"));
-        buttonPanel.add(makeEntryButton("/"));
-        
-        
-        //row 3
+        buttonPanel.add(makeEntryButton(" * "));
+             
+        //row 4
         for (int i = 1; i <= 3; i++) {
             buttonPanel.add(makeEntryButton(Integer.toString(i)));
         }
-        buttonPanel.add(makeEntryButton("+"));
-        buttonPanel.add(makeEntryButton("-"));
-        
-        
-        //row 4
+        buttonPanel.add(makeEntryButton(" - "));
+               
+        //row 5
         buttonPanel.add(makeEntryButton("0"));
-        buttonPanel.add(makeEntryButton(" "));
+        buttonPanel.add(makeEntryButton("."));
         buttonPanel.add(makeEqualsButton());
-
+        buttonPanel.add(makeEntryButton(" + "));
         
+        //row 6
+        buttonPanel.add(makeEntryButton(" "));
+
+        //Add the button panel to the visiable pane
         contentPane.add(buttonPanel);
         frame.pack();
         frame.setVisible(true);
     }
 
+    
     private JButton makeEntryButton(String entry) {
         final String buttonText = entry;
         final JButton button = new JButton(buttonText);
@@ -87,7 +117,9 @@ public class GUI {
 
     private void addToEntry(String s) {
         String current = entryField.getText();
-        entryField.setText(current + s);
+        if(current.length() < 30 ) {
+            entryField.setText(current + s);
+        }
     }
 
     
@@ -97,42 +129,57 @@ public class GUI {
         
             @Override
             public void actionPerformed(ActionEvent e) {
-                
+                TokenQueue queue = new TokenQueue();
+                Evaluator evaluator = new Evaluator();
+                Tokeniser tokeniser = new Tokeniser(entryField.getText());
+                Parser parser = new Parser();
+                while(tokeniser.hasNext()) {
+                        queue.add(tokeniser.next());
+                }
                 //create a Tokeniser and pass it the string in the entry field
                 //and add each token into the queue. Then pass that queue to the
-                //evaluator which, if given a valid postfix expression, should
-                //return an int
-                PostfixQueue queue = new PostfixQueue();
-                PostfixEvaluator evaluator = new PostfixEvaluator();
-                Tokeniser tokeniser = new Tokeniser(entryField.getText());
-                while(tokeniser.hasNext()) {
-                    queue.add(tokeniser.next());
-                }
+                //parser which, if given a valid infix expression, should
+                //return a queue as a valid postfix expression. This queue is
+                //then passed to the evaluator.
                 try {
-                    updateEntry(evaluator.evaluate(queue));
+                    if(buttonPressed == 'i') {
+                        updateEntry(evaluator.evaluate(parser.infixToPostfix(queue))); 
+                    }
+                    else { //postfix mode
+                        updateEntry(evaluator.evaluate(queue));
+                    }
                 }
-                catch(ParseException exception) {
+                catch(ParseException parseEx) {
                     queue = null;
                     evaluator = null;
                     tokeniser = null;
-                    updateEntry(exception.getMessage());
+                    updateEntry(parseEx.getMessage());
                 }
+                catch(NumberFormatException numForEx) {
+                    queue = null;
+                    evaluator = null;
+                    tokeniser = null;
+                    updateEntry(numForEx.getMessage());
+                }
+                catch(NoSuchElementException elEx) {
+                    queue = null;
+                    evaluator = null;
+                    tokeniser = null;
+                    updateEntry(elEx.getMessage());
+                }
+                catch(UnsupportedOperationException unsOpEx) {
+                    queue = null;
+                    evaluator = null;
+                    tokeniser = null;
+                    updateEntry(unsOpEx.getMessage());
+                }                
+                               
             }
 
         });
         return eqButton;
 
     }  
-    
-
-    private void updateEntry(String s) {
-        entryField.setText(s);
-    }
-
-    
-    private void updateEntry(int i) {
-        entryField.setText(Integer.toString(i));
-    }
     
     
     private JButton makeClearButton() {
@@ -141,7 +188,7 @@ public class GUI {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                entryField.setText("");
+                updateEntry("");
             }
 
         });
@@ -158,12 +205,107 @@ public class GUI {
                 String text = entryField.getText();
                 
                 if (text != null && !text.isEmpty()) {
-                text = text.substring(0, text.length() - 1);
-                entryField.setText(text);
+                    text = text.substring(0, text.length() - 1);
+                    updateEntry(text);
                 }            
             }
 
         });
         return clrButton;
     }
+    
+    
+    private JRadioButton makeInfixButton () {
+        final JRadioButton ifButton = new JRadioButton("Infix",true);
+        
+        ifButton.addActionListener(new ActionListener() {           
+        @Override
+            public void actionPerformed(ActionEvent e) {
+                //if the Infix button is already selected do nothing.
+                if (buttonPressed != 'i') {
+                    buttonPressed = 'i';
+                    Parser parser = new Parser();
+                    TokenQueue queue = new TokenQueue();
+                    Tokeniser tokeniser = new Tokeniser(entryField.getText());
+                    while(tokeniser.hasNext()) {
+                        queue.add(tokeniser.next());
+                    }
+                    try {
+                        updateEntry(parser.postfixToInfix(queue).toString());
+                    }
+                    catch(ParseException parseEx) {
+                        queue = null;                        
+                        tokeniser = null;
+                        updateEntry(parseEx.getMessage());
+                    }
+                    catch(NoSuchElementException elEx) {
+                        queue = null;
+                        tokeniser = null;
+                        updateEntry(elEx.getMessage());
+                    }
+                    catch(UnsupportedOperationException unsOpEx) {
+                        queue = null;
+                        tokeniser = null;
+                        updateEntry(unsOpEx.getMessage());
+                    }
+                }
+            }
+        });
+        
+        return ifButton;
+    }
+    
+    
+    private JRadioButton makePostfixButton () {
+        final JRadioButton pfButton = new JRadioButton("Postfix",false);
+        
+        pfButton.addActionListener(new ActionListener() {      
+            @Override
+            public void actionPerformed(ActionEvent e) {        
+                //if the Postfix button is already selected do nothing.
+                if (buttonPressed != 'p') {
+                    buttonPressed = 'p';
+                    TokenQueue queue = new TokenQueue();
+                    Tokeniser tokeniser = new Tokeniser(entryField.getText());
+                    Parser parser = new Parser();
+                    while(tokeniser.hasNext()) {
+                        queue.add(tokeniser.next());
+                    }
+                    try {                 
+                        updateEntry(parser.infixToPostfix(queue).toString());                   
+                    }
+                    catch(ParseException parseEx) {
+                        queue = null;                        
+                        tokeniser = null;
+                        updateEntry(parseEx.getMessage());
+                    }
+                    catch(NoSuchElementException elEx) {
+                        queue = null;
+                        tokeniser = null;
+                        updateEntry(elEx.getMessage());
+                    }
+                    catch(UnsupportedOperationException unsOpEx) {
+                        queue = null;
+                        tokeniser = null;
+                        updateEntry(unsOpEx.getMessage());
+                    }
+                }                       
+                               
+            }
+        });
+        return pfButton;
+    }
+    
+
+    private void updateEntry(String s) {
+        entryField.setText(s);
+    }
+
+    
+    private void updateEntry(double d) {
+        entryField.setText(Double.toString(d));
+    }
+   
+    
+    
 }

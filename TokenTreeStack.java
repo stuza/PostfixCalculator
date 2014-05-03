@@ -3,8 +3,8 @@ package calculator;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
 
-public class TokenStack {
-    ArrayList<Token> stack = new ArrayList<Token>();
+public class TokenTreeStack {
+    ArrayList<TokenTree> stack = new ArrayList<TokenTree>();
     
     /**
      * Returns the number of Tokens in this stack
@@ -16,12 +16,12 @@ public class TokenStack {
     }
 
     /**
-     * Returns, but does not remove, the Token at the top of this stack
+     * Returns, but does not remove, the TokenTree at the top of this stack
      *
-     * @return the Token at the top of the stack
+     * @return the TokenTree at the top of the stack
      * @throws NoSuchElementException if this stack is empty
      */
-    public Token peek() throws NoSuchElementException {
+    public TokenTree peek() throws NoSuchElementException {
         if (stack.size() != 0) {
             return stack.get(stack.size() -1);
         }
@@ -29,12 +29,12 @@ public class TokenStack {
     }
 
     /**
-     * Returns and removes the Token at the top of the stack
+     * Returns and removes the TokenTree at the top of the stack
      *
-     * @return the Token at the top of the stack
+     * @return the TokenTree at the top of the stack
      * @throws NoSuchElementException if this Queue is empty
      */
-    public Token pop() throws NoSuchElementException {
+    public TokenTree pop() throws NoSuchElementException {
         if (stack.size() != 0) {
             return stack.remove(stack.size() - 1);
         }
@@ -42,13 +42,14 @@ public class TokenStack {
     }
 
     /**
-     * Adds a Token to the top of this stack
+     * Adds a TokenTree to the top of this stack
      *
      * @param t Token to be added to the top of the stack
      */
-    public void push(Token t) {
+    public void push(TokenTree t) {
         stack.add(t);
     }
+    
     
     Boolean isEmpty() {
     	return stack.size()==0;
