@@ -22,45 +22,34 @@ public class GUI {
 
     private final JFrame frame = new JFrame("Calculator");
     private final JTextField entryField = new JTextField(30);
+    private char mode = 'i';   
     
-    private char buttonPressed = 'i';
     
-    //Create the buttons
-    JRadioButton infixButton = makeInfixButton();
-    JRadioButton postfixButton = makePostfixButton();
-
     public GUI() {
-        
+               
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);     
         Container contentPane = frame.getContentPane();
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
-        
-        //Entry Field
-        entryField.setHorizontalAlignment(JTextField.TRAILING);
-        entryField.setEditable(false);
-        contentPane.add(entryField);
-        
-      
-        //Radio buttons for in/postfix    
-        //Add them to a ButtonGroup
+                
+        //make the radio buttons and add them to a ButtonGroup
+        JRadioButton infixButton = makeInfixButton();
+        JRadioButton postfixButton = makePostfixButton();
         ButtonGroup radioButtonGroup = new ButtonGroup();
         radioButtonGroup.add(infixButton);
         radioButtonGroup.add(postfixButton);
-
-        //Add them to a Panel
+        //Now add them to a Panel
         JPanel radioPanel = new JPanel();
         radioPanel.setLayout(new GridLayout(1, 2));
         radioPanel.add(infixButton);
         radioPanel.add(postfixButton);
-
         //Set a border and make add it to the content pane
         radioPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), ""));
         contentPane.add(radioPanel);
         
-        //Button Panel
+        //Now create the main input button panel
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new GridLayout(6,4));
-       
+ 
         //row 1
         buttonPanel.add(makeEntryButton("("));      
         buttonPanel.add(makeEntryButton(")"));
@@ -142,7 +131,7 @@ public class GUI {
                 //return a queue as a valid postfix expression. This queue is
                 //then passed to the evaluator.
                 try {
-                    if(buttonPressed == 'i') {
+                    if(mode == 'i') {
                         updateEntry(evaluator.evaluate(parser.infixToPostfix(queue))); 
                     }
                     else { //postfix mode
@@ -222,8 +211,8 @@ public class GUI {
         @Override
             public void actionPerformed(ActionEvent e) {
                 //if the Infix button is already selected do nothing.
-                if (buttonPressed != 'i') {
-                    buttonPressed = 'i';
+                if (mode != 'i') {
+                    mode = 'i';
                     Parser parser = new Parser();
                     TokenQueue queue = new TokenQueue();
                     Tokeniser tokeniser = new Tokeniser(entryField.getText());
@@ -263,8 +252,8 @@ public class GUI {
             @Override
             public void actionPerformed(ActionEvent e) {        
                 //if the Postfix button is already selected do nothing.
-                if (buttonPressed != 'p') {
-                    buttonPressed = 'p';
+                if (mode != 'p') {
+                    mode = 'p';
                     TokenQueue queue = new TokenQueue();
                     Tokeniser tokeniser = new Tokeniser(entryField.getText());
                     Parser parser = new Parser();

@@ -33,7 +33,8 @@ public class Tokeniser implements Iterator<Token> {
      * Determine whether we have read the last token in the expression
      * @return true if there is another token to be read from the expression
      * false otherwise. Will return false if expr is longer than 1024 
-     * characters to stop overflow.
+     * characters to stop overflow. No reason whatsoever behind the choice of
+     * 1024.
      */
     @Override
     public boolean hasNext() {
@@ -145,6 +146,6 @@ public class Tokeniser implements Iterator<Token> {
 
     @Override
     public void remove() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        System.out.println("Unsupported Operation");
     }
 }

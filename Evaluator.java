@@ -5,8 +5,7 @@ import java.util.NoSuchElementException;
 
 public class Evaluator {
     //create our empty stack, s.
-    TokenStack s = new TokenStack();
-    
+    TokenStack s = new TokenStack(); 
     
     /**
      * Evaluate a queue of Tokens in Postfix order. This function is recursive.
