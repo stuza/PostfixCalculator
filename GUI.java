@@ -1,3 +1,4 @@
+
 package calculator;
 
 import java.awt.Container;
@@ -15,43 +16,54 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import java.util.NoSuchElementException;
 /**
- *
- * @author Stuart McKenzie 10077518
- */
+*
+* @author Stuart McKenzie 10077518
+*/
 public class GUI {
 
     private final JFrame frame = new JFrame("Calculator");
     private final JTextField entryField = new JTextField(30);
-    private char mode = 'i';   
     
+    private char buttonPressed = 'i';
     
+    //Create the buttons
+    JRadioButton infixButton = makeInfixButton();
+    JRadioButton postfixButton = makePostfixButton();
+
     public GUI() {
-               
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);     
+        
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         Container contentPane = frame.getContentPane();
         contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
-                
-        //make the radio buttons and add them to a ButtonGroup
-        JRadioButton infixButton = makeInfixButton();
-        JRadioButton postfixButton = makePostfixButton();
+        
+        //Entry Field
+        entryField.setHorizontalAlignment(JTextField.TRAILING);
+        entryField.setEditable(false);
+        contentPane.add(entryField);
+        
+      
+        //Radio buttons for in/postfix
+        //Add them to a ButtonGroup
         ButtonGroup radioButtonGroup = new ButtonGroup();
         radioButtonGroup.add(infixButton);
         radioButtonGroup.add(postfixButton);
-        //Now add them to a Panel
+
+        //Add them to a Panel
         JPanel radioPanel = new JPanel();
         radioPanel.setLayout(new GridLayout(1, 2));
         radioPanel.add(infixButton);
         radioPanel.add(postfixButton);
+
         //Set a border and make add it to the content pane
         radioPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), ""));
         contentPane.add(radioPanel);
         
-        //Now create the main input button panel
+        //Button Panel
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new GridLayout(6,4));
- 
+       
         //row 1
-        buttonPanel.add(makeEntryButton("("));      
+        buttonPanel.add(makeEntryButton("("));
         buttonPanel.add(makeEntryButton(")"));
         buttonPanel.add(makeDelButton());
         buttonPanel.add(makeClearButton());
@@ -131,8 +143,8 @@ public class GUI {
                 //return a queue as a valid postfix expression. This queue is
                 //then passed to the evaluator.
                 try {
-                    if(mode == 'i') {
-                        updateEntry(evaluator.evaluate(parser.infixToPostfix(queue))); 
+                    if(buttonPressed == 'i') {
+                        updateEntry(evaluator.evaluate(parser.infixToPostfix(queue)));
                     }
                     else { //postfix mode
                         updateEntry(evaluator.evaluate(queue));
@@ -161,14 +173,14 @@ public class GUI {
                     evaluator = null;
                     tokeniser = null;
                     updateEntry(unsOpEx.getMessage());
-                }                
+                }
                                
             }
 
         });
         return eqButton;
 
-    }  
+    }
     
     
     private JButton makeClearButton() {
@@ -196,7 +208,7 @@ public class GUI {
                 if (text != null && !text.isEmpty()) {
                     text = text.substring(0, text.length() - 1);
                     updateEntry(text);
-                }            
+                }
             }
 
         });
@@ -207,12 +219,12 @@ public class GUI {
     private JRadioButton makeInfixButton () {
         final JRadioButton ifButton = new JRadioButton("Infix",true);
         
-        ifButton.addActionListener(new ActionListener() {           
+        ifButton.addActionListener(new ActionListener() {
         @Override
             public void actionPerformed(ActionEvent e) {
                 //if the Infix button is already selected do nothing.
-                if (mode != 'i') {
-                    mode = 'i';
+                if (buttonPressed != 'i') {
+                    buttonPressed = 'i';
                     Parser parser = new Parser();
                     TokenQueue queue = new TokenQueue();
                     Tokeniser tokeniser = new Tokeniser(entryField.getText());
@@ -223,7 +235,7 @@ public class GUI {
                         updateEntry(parser.postfixToInfix(queue).toString());
                     }
                     catch(ParseException parseEx) {
-                        queue = null;                        
+                        queue = null;
                         tokeniser = null;
                         updateEntry(parseEx.getMessage());
                     }
@@ -248,23 +260,23 @@ public class GUI {
     private JRadioButton makePostfixButton () {
         final JRadioButton pfButton = new JRadioButton("Postfix",false);
         
-        pfButton.addActionListener(new ActionListener() {      
+        pfButton.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {        
+            public void actionPerformed(ActionEvent e) {
                 //if the Postfix button is already selected do nothing.
-                if (mode != 'p') {
-                    mode = 'p';
+                if (buttonPressed != 'p') {
+                    buttonPressed = 'p';
                     TokenQueue queue = new TokenQueue();
                     Tokeniser tokeniser = new Tokeniser(entryField.getText());
                     Parser parser = new Parser();
                     while(tokeniser.hasNext()) {
                         queue.add(tokeniser.next());
                     }
-                    try {                 
-                        updateEntry(parser.infixToPostfix(queue).toString());                   
+                    try {
+                        updateEntry(parser.infixToPostfix(queue).toString());
                     }
                     catch(ParseException parseEx) {
-                        queue = null;                        
+                        queue = null;
                         tokeniser = null;
                         updateEntry(parseEx.getMessage());
                     }
@@ -278,7 +290,7 @@ public class GUI {
                         tokeniser = null;
                         updateEntry(unsOpEx.getMessage());
                     }
-                }                       
+                }
                                
             }
         });
@@ -298,3 +310,4 @@ public class GUI {
     
     
 }
+

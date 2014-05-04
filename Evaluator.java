@@ -68,21 +68,19 @@ public class Evaluator {
 	                //create a token that represents the result of this operation  
 	                //and push it on to stack s.
 	                if (t.getValue() == Token.PLUS) {
-	                    Token resultToken = new Token(Token.NUMBER,(v.getValue()+u.getValue()));
-	                    s.push(resultToken);
+	                    s.push(new Token(Token.NUMBER,(v.getValue()+u.getValue())));
 	                }
 	                else if (t.getValue() == Token.MINUS) {
-	                    Token resultToken = new Token(Token.NUMBER,(v.getValue()-u.getValue()));
-	                    s.push(resultToken);       
+	                    s.push(new Token(Token.NUMBER,(v.getValue()-u.getValue())));       
 	                }
 	                else if (t.getValue() == Token.TIMES) {
-	                    Token resultToken = new Token(Token.NUMBER,(v.getValue()*u.getValue()));
-	                    s.push(resultToken);
+	                    s.push(new Token(Token.NUMBER,(v.getValue()*u.getValue())));
 	                }
 	                else if (t.getValue() == Token.DIVIDE) {
-	                    Token resultToken = new Token(Token.NUMBER,(v.getValue()/u.getValue()));
-	                    s.push(resultToken);
+	                    s.push(new Token(Token.NUMBER,(v.getValue()/u.getValue())));
 	                }
+                        u=null;
+                        v=null;
 	            }
             }
             
