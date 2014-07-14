@@ -44,7 +44,7 @@ public class TreeMaker {
             //the stack. Push this TokenTree on to the stack. If you find that you
             //cannot pop two tokens because there are not enough elements
             //on the stack then throw an exception.
-            else if (t.isOperator() && s.size() >= 2) {
+            else if(t.isOperator()) {
                 s.push(new TokenTree(s.pop(),s.pop(),t));
             }
             else {

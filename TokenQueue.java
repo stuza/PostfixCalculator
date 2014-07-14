@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.NoSuchElementException;
 
 public class TokenQueue {
-    LinkedList<Token> queue = new LinkedList<Token>();
+    private LinkedList<Token> queue = new LinkedList<Token>();
     
     
     /**

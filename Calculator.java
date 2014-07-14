@@ -11,12 +11,12 @@ public class Calculator {
      */
     public static void main(String[] args) {
         javax.swing.SwingUtilities.invokeLater(
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        createAndShowGui();
-                    }
+            new Runnable() {
+                @Override
+                public void run() {
+                    createAndShowGui();
                 }
+            }
         );
     }
     

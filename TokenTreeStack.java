@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.NoSuchElementException;
 
 public class TokenTreeStack {
-    ArrayList<TokenTree> stack = new ArrayList<TokenTree>();
+    private ArrayList<TokenTree> stack = new ArrayList<TokenTree>();
     
     /**
      * Returns the number of Tokens in this stack
